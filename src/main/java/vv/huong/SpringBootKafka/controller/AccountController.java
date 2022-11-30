@@ -1,6 +1,6 @@
 package vv.huong.SpringBootKafka.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,14 +9,24 @@ import org.springframework.web.bind.annotation.RestController;
 import vv.huong.SpringBootKafka.model.AccountDTO;
 import vv.huong.SpringBootKafka.model.MessageDTO;
 import vv.huong.SpringBootKafka.model.StatisticDTO;
+import vv.huong.SpringBootKafka.repository.AccountRepo;
+import vv.huong.SpringBootKafka.repository.MessageRepo;
+import vv.huong.SpringBootKafka.repository.StatisticRepo;
 
 import java.util.Date;
 
 @RestController
 @RequestMapping("/account")
 public class AccountController {
-    @Autowired
-    KafkaTemplate<String, Object> kafkaTemplate;
+    private final MessageRepo messageRepo;
+    private final AccountRepo accountRepo;
+    private final StatisticRepo statisticRepo;
+
+    public AccountController(MessageRepo messageRepo, AccountRepo accountRepo, StatisticRepo statisticRepo) {
+        this.messageRepo = messageRepo;
+        this.accountRepo = accountRepo;
+        this.statisticRepo = statisticRepo;
+    }
 
     @PostMapping("/new")
     public AccountDTO create(@RequestBody AccountDTO account) {
@@ -27,8 +37,9 @@ public class AccountController {
         messageDTO.setSubject("Welcome to kafka");
         messageDTO.setContent("Spring boot application with kafka");
 
-        kafkaTemplate.send("notification", messageDTO);
-        kafkaTemplate.send("statistic", stat);
+        accountRepo.save(account);
+        messageRepo.save(messageDTO);
+        statisticRepo.save(stat);
 
         return account;
     }
