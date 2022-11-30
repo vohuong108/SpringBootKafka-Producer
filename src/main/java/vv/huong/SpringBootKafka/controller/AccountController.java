@@ -22,7 +22,7 @@ public class AccountController {
     public AccountDTO create(@RequestBody AccountDTO account) {
         StatisticDTO stat = new StatisticDTO("Account " + account.getEmail() + " is created", new Date());
         MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setTo(account.getName());
+        messageDTO.setTo(account.getEmail());
         messageDTO.setToName(account.getName());
         messageDTO.setSubject("Welcome to kafka");
         messageDTO.setContent("Spring boot application with kafka");
